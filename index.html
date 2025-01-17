@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jeu de Flashcards - Vocabulaire Anglais</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        #game, #results { display: none; }
+        #word-list { display: flex; flex-wrap: wrap; justify-content: center; }
+        .word { margin: 5px; padding: 10px; border: 1px solid #000; cursor: pointer; }
+        .selected { background-color: lightblue; }
+    </style>
+</head>
+<body>
+    <h1>Jeu de Flashcards - Vocabulaire Anglais</h1>
+    
+    <div id="selection">
+        <h2>Sélectionnez jusqu'à 50 mots</h2>
+        <div id="word-list"></div>
+        <button id="start-game">Commencer</button>
+    </div>
+    
+    <div id="game">
+        <h2 id="game-title"></h2>
+        <div id="game-container"></div>
+        <input type="text" id="answer" placeholder="Entrez votre réponse">
+        <button id="submit-answer">Valider</button>
+        <button id="next">Suivant</button>
+    </div>
+    
+    <div id="results">
+        <h2>Résultats</h2>
+        <p id="score"></p>
+        <button onclick="location.reload()">Recommencer</button>
+    </div>
+    
+    <script>
+        const words = [
+            { word: "apple", definition: "A round fruit with red, yellow, or green skin and firm white flesh." },
+            { word: "dog", definition: "A domesticated carnivorous mammal that typically has a long snout and an acute sense of smell." },
+            { word: "ocean", definition: "A very large expanse of sea, in particular, each of the main areas into which the sea is divided geographically." }
+        ];
+        
+        const selectedWords = [];
+        const wordList = document.getElementById("word-list");
+        const startButton = document.getElementById("start-game");
+        const gameSection = document.getElementById("game");
+        const selectionSection = document.getElementById("selection");
+        const gameContainer = document.getElementById("game-container");
+        const gameTitle = document.getElementById("game-title");
+        const answerInput = document.getElementById("answer");
+        const submitButton = document.getElementById("submit-answer");
+        const nextButton = document.getElementById("next");
+        const resultsSection = document.getElementById("results");
+        const scoreDisplay = document.getElementById("score");
+        
+        words.forEach(({ word }) => {
+            const div = document.createElement("div");
+            div.textContent = word;
+            div.classList.add("word");
+            div.onclick = () => {
+                if (selectedWords.includes(word)) {
+                    selectedWords.splice(selectedWords.indexOf(word), 1);
+                    div.classList.remove("selected");
+                } else if (selectedWords.length < 50) {
+                    selectedWords.push(word);
+                    div.classList.add("selected");
+                }
+            };
+            wordList.appendChild(div);
+        });
+        
+        startButton.onclick = () => {
+            if (selectedWords.length > 0) {
+                selectionSection.style.display = "none";
+                gameSection.style.display = "block";
+                startGame();
+            }
+        };
+        
+        let currentIndex = 0;
+        let correctAnswers = 0;
+        
+        function startGame() {
+            if (currentIndex < selectedWords.length) {
+                const currentWord = words.find(w => w.word === selectedWords[currentIndex]);
+                gameTitle.textContent = `Définition : ${currentWord.definition}`;
+                answerInput.value = "";
+            } else {
+                endGame();
+            }
+        }
+        
+        submitButton.onclick = () => {
+            const currentWord = words.find(w => w.word === selectedWords[currentIndex]);
+            if (answerInput.value.toLowerCase() === currentWord.word.toLowerCase()) {
+                correctAnswers++;
+            }
+            currentIndex++;
+            startGame();
+        };
+        
+        nextButton.onclick = () => {
+            currentIndex++;
+            startGame();
+        };
+        
+        function endGame() {
+            gameSection.style.display = "none";
+            resultsSection.style.display = "block";
+            scoreDisplay.textContent = `Score : ${correctAnswers}/${selectedWords.length}`;
+        }
+    </script>
+</body>
+</html>
